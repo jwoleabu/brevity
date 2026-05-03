@@ -15,11 +15,27 @@ export function Profile() {
       </div>
       <ProfileSection name="Myname">
         <p>Sampletext</p>
+        <p>Sampletext</p>
       </ProfileSection>
       <ProfileSection name="Education">
         <p>Sampletext</p>
       </ProfileSection>
-            <ProfileSection name="Experience">
+      <ProfileSection name="Experience">
+        <p>Sampletext</p>
+      </ProfileSection>
+      <ProfileSection name="Links">
+        <p>Sampletext</p>
+      </ProfileSection>
+      <ProfileSection name="Skills">
+        <p>Sampletext</p>
+      </ProfileSection>
+      <ProfileSection name="Links">
+        <p>Sampletext</p>
+      </ProfileSection>
+      <ProfileSection name="Links">
+        <p>Sampletext</p>
+      </ProfileSection>
+            <ProfileSection name="Links">
         <p>Sampletext</p>
       </ProfileSection>
             <ProfileSection name="Links">

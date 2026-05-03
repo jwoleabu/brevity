@@ -137,4 +137,19 @@
     --container-sm: 24em;
     --radius: 0.625em !important;
   }
+
+*::-webkit-scrollbar {
+  width: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: rgb(94, 94, 94);
+}
+
+*::-webkit-scrollbar-track {
+  margin: 10px;
+  background: rgb(215, 215, 215);  
+}
+
 }

@@ -30,12 +30,8 @@ export function Autofill({ savedMinutes }: AutofillProps) {
 
     setLoading(true);
 
-    toast.promise(autofillPromise, {
-      loading: "Filling page...",
-      success: "Autofill completed!",
-      error: "Autofill failed",
-    });
     autofillPromise.finally(() => {
+      toast.success("Autofill completed!")
       setLoading(false);
     })
   };
