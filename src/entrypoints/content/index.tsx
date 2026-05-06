@@ -1,16 +1,6 @@
-import { Toaster } from "@/components/ui/sonner";
-import "./styles.css";
-import { Navigation } from "@/components/views/navigation";
+import Extension from "./app";
 import { createRoot } from "react-dom/client";
 
-function App() {
-  return (
-    <div className="fixed top-0 right-0 m-3 max-h-[calc(100vh-32px)] w-full max-w-sm bg-background pr-4 pl-4 pb-4 rounded-md flex flex-col overflow-y-scroll scroll z-100000">
-        <Navigation />
-      <Toaster position="bottom-left" duration={1500} />
-    </div>
-  );
-}
 
 export default defineContentScript({
   matches: ["<all_urls>"],
@@ -22,7 +12,7 @@ export default defineContentScript({
       anchor: "body",
       onMount: (container) => {
         const root = createRoot(container);
-        root.render(<App />);
+        root.render(<Extension />);
         return root;
       },
       onRemove: (root) => {

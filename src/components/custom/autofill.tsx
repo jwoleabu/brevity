@@ -40,7 +40,7 @@ export function Autofill({ savedMinutes }: AutofillProps) {
       <p className="text-sm font-medium text-foreground">
         Autofill this job application!
       </p>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm">
         {" "}
         {formatted ? (
           <>
@@ -54,6 +54,7 @@ export function Autofill({ savedMinutes }: AutofillProps) {
       <Button
         size="sm"
         onClick={handeClick} disabled={loading}
+        className="bg-[#E6E1FF] hover:bg-[#f3f1ff] text-black ring-1 ring-black"
       >
         <Zap className={loading ? "animate-spin" : ""}/>
         Autofill Page
