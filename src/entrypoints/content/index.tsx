@@ -13,7 +13,7 @@ export default defineContentScript({
       anchor: "body",
       onMount: (container) => {
         const root = createRoot(container);
-        root.render(<Extension />);
+        root.render(<Extension onClose={() => ui.remove()} />);
         return root;
       },
       onRemove: (root) => {
