@@ -5,7 +5,7 @@ export default defineBackground(() => {
   browser.action.onClicked.addListener((tab) => {
     if (!tab?.id) return;
     console.log("icon click event");
-    browser.tabs.sendMessage(tab.id, { type: MessageType.START_PANEL });
+    browser.tabs.sendMessage(tab.id, { type: MessageType.TOGGLE_UI });
   });
 
   browser.runtime.onMessage.addListener((message: Message) => {

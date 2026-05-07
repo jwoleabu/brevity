@@ -1,3 +1,4 @@
+import { Message, MessageType } from "@/lib/message";
 import Extension from "./app";
 import { createRoot } from "react-dom/client";
 
@@ -19,6 +20,24 @@ export default defineContentScript({
         root?.unmount();
       },
     });
-    ui.mount();
-  },
+
+    const listener = (message : Message)=>{
+      switch(message.type){
+        case MessageType.TOGGLE_UI:
+          ui.mounted ? ui.remove() : ui.mount();
+          break;
+        case MessageType.CLOSE:
+          if (!ui.mounted) break;
+          ui.remove();
+          break;
+      }
+    }
+
+    browser.runtime.onMessage.addListener(listener);
+    
+    ctx.onInvalidated(() => {
+      browser.runtime.onMessage.removeListener(listener);
+    })
+  }
+
 });
