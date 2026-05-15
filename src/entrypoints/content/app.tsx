@@ -7,6 +7,14 @@ import icon from "@/assets/filled_icon.svg";
 import { MessageType } from "@/lib/message";
 
 function Extension({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    browser.runtime.sendMessage({ type: MessageType.CONTENT_SCRIPT_MOUNTED });
+    return () => {
+      browser.runtime.sendMessage({
+        type: MessageType.CONTENT_SCRIPT_UNMOUNTED,
+      });
+    };
+  }, []);
   return (
     <div className="fixed top-0 right-0 m-3 max-h-[calc(100vh-32px)] w-full max-w-sm bg-background pr-4 pl-4 pb-4 rounded-md flex flex-col overflow-y-scroll overscroll-contain z-100000">
       <div className="flex flex-row items-center justify-between mt-5">
