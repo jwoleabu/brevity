@@ -4,9 +4,6 @@ import tailwindcss from "@tailwindcss/vite";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
-  webExt: {
-    chromiumArgs: ["--user-data-dir=./.wxt/chrome-data"],
-  },
   modules: ["@wxt-dev/module-react", "@wxt-dev/auto-icons"],
   srcDir: "src",
   vite: () => ({

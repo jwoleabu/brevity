@@ -42,7 +42,7 @@ function Extension({ onClose }: { onClose: () => void }) {
         </div>
       </div>
       <Navigation />
-      <Toaster position="bottom-left" duration={1500} />
+      <Toaster position="bottom-left" duration={1500}/>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { Message, MessageType } from "@/lib/message";
 import Extension from "./app";
 import { createRoot } from "react-dom/client";
-
+import { StrictMode } from "react";
 
 export default defineContentScript({
   matches: ["<all_urls>"],
@@ -13,7 +13,11 @@ export default defineContentScript({
       anchor: "body",
       onMount: (container) => {
         const root = createRoot(container);
-        root.render(<Extension onClose={() => ui.remove()} />);
+        root.render(
+          <StrictMode>
+            <Extension onClose={() => ui.remove()} />
+          </StrictMode>,
+        );
         return root;
       },
       onRemove: (root) => {
@@ -21,8 +25,8 @@ export default defineContentScript({
       },
     });
 
-    const listener = (message : Message)=>{
-      switch(message.type){
+    const listener = (message: Message) => {
+      switch (message.type) {
         case MessageType.TOGGLE_UI:
           ui.mounted ? ui.remove() : ui.mount();
           break;
@@ -31,13 +35,12 @@ export default defineContentScript({
           ui.remove();
           break;
       }
-    }
+    };
 
     browser.runtime.onMessage.addListener(listener);
-    
+
     ctx.onInvalidated(() => {
       browser.runtime.onMessage.removeListener(listener);
-    })
-  }
-
+    });
+  },
 });

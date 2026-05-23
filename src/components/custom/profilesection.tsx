@@ -14,8 +14,8 @@ export function ProfileSection({
 }: ProfileSectionProps) {
   return (
     <>
-      <p className="text-base mt-5 mb-1">{name}</p>
-      <div className={cn("border-b pb-4", className)}>{children}</div>
+      <p className="text-base mt-5 mb-2 font-semibold">{name}</p>
+      <div className={cn("border-b pb-4 flex gap-5", className)}>{children}</div>
     </>
   );
 }

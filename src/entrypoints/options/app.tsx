@@ -1,18 +1,13 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { createNewWorkspace } from "@/lib/db";
 import { Message, MessageType } from "@/lib/message";
-import {useForm} from "react-hook-form"
-
-  type FormFields = {
-    email: string;
-    password: string;
-  };
+import { BugReportForm } from "@/components/custom/error";
 
 function App() {
+  const [workspaceName, setWorkspaceName] = useState("");
   const [text, setText] = useState<string>("options");
-  const form = useForm<FormFields>();
 
   useEffect(() => {
     browser.runtime.sendMessage({ type: MessageType.OPTIONS_PAGE_READY });
@@ -24,18 +19,29 @@ function App() {
     };
     browser.runtime.onMessage.addListener(listener);
     return () => browser.runtime.onMessage.removeListener(listener);
+    
   }, []);
 
   return (
-    <div>
+    <div className="flex flex-col">
       <p className="text-9xl">{text}</p>
+      <input
+        className="border border-black text-2xl px-4 py-4"
+        name="input"
+        value={workspaceName}
+        onChange={(e) => {setWorkspaceName(e.target.value)}}
+      ></input>
+
       <Button
         onClick={async () => {
-          try{
-            await createNewWorkspace("devops");
-            browser.runtime.sendMessage({type: MessageType.WORKSPACES_UPDATED});
-          }
-          catch (err){
+          if (!workspaceName.trim()) return;
+          try {
+            await createNewWorkspace(workspaceName.trim());
+            await browser.runtime.sendMessage({
+                type: MessageType.WORKSPACES_UPDATED,
+            });
+            console.log("sending workspace updated")
+          } catch (err) {
             console.error(err);
           }
         }}
@@ -43,11 +49,9 @@ function App() {
         Add devops to database
       </Button>
 
-      <form>
-      </form>
-      <Button onClick={async () =>{
-
-      }}>Create actual workspace</Button>
+      <form></form>
+      <Button onClick={async () => {}}>Create actual workspace</Button>
+      <BugReportForm></BugReportForm>
     </div>
   );
 }

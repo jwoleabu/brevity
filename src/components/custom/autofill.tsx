@@ -54,7 +54,7 @@ export function Autofill({ savedMinutes }: AutofillProps) {
       <Button
         size="sm"
         onClick={handeClick} disabled={loading}
-        className="bg-[#E6E1FF] hover:bg-[#f3f1ff] text-black ring-1 ring-black"
+        className="bg-[#E6E1FF] hover:bg-[#f3f1ff] text-black border-2 border-black"
       >
         <Zap className={loading ? "animate-spin" : ""}/>
         Autofill Page

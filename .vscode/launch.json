@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to Chrome",
+            "port": 9222, //update with the value given by 'npm: get-chrome-debugging-port' task
+            "request": "attach",
+            "type": "chrome",
+            "webRoot": "${workspaceFolder}/src",
+            "sourceMaps": true,
+            "sourceMapPathOverrides": {
+                "../../../src/*": "${webRoot}/*",
+                "../../src/*": "${webRoot}/*",
+                //"../../*": "${webRoot}/*" // Mandatory to enable VSCode to rebuild the actual path to the source scripts.
+            }
+        },
+    ]
+}

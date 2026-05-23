@@ -5,7 +5,10 @@ export enum MessageType {
   TOGGLE_UI = "TOGGLE_UI",
   CLOSE = "CLOSE",
   GET_WORKSPACES_META = "GET_WORKSPACES_META",
+  GET_PROFILE = "GET_PROFILE",
+
   WORKSPACES_UPDATED = "WORKSPACES_UPDATED",
+  PROFILE_UPDATED = "PROFILE_UPDATED",
   CONTENT_SCRIPT_MOUNTED = "CONTENT_SCRIPT_MOUNTED",
   CONTENT_SCRIPT_UNMOUNTED = "CONTENT_SCRIPT_UNMOUNTED",
 }
@@ -17,6 +20,8 @@ export type Message =
   | { type: typeof MessageType.TOGGLE_UI }
   | { type: typeof MessageType.CLOSE }
   | { type: typeof MessageType.GET_WORKSPACES_META }
+  | { type: typeof MessageType.GET_PROFILE }
   | { type: typeof MessageType.WORKSPACES_UPDATED }
+  | { type: typeof MessageType.PROFILE_UPDATED }
   | { type: typeof MessageType.CONTENT_SCRIPT_MOUNTED }
   | { type: typeof MessageType.CONTENT_SCRIPT_UNMOUNTED };

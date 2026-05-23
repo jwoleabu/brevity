@@ -11,12 +11,7 @@ export interface Workspace {
   id: string;
   name: string;
 
-  profile: {
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    phone?: string;
-  };
+  profileOverride?: Partial<Profile>
 
   education: Education[];
   experience: Experience[];
@@ -24,6 +19,17 @@ export interface Workspace {
 
   createdAt:number;
   updatedAt:number;
+}
+
+export interface Settings {
+  profile: Profile;
+}
+
+export interface Profile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
 }
 
 interface Education {
@@ -52,3 +58,10 @@ export interface Link {
   label: string;
   url: string;
 }
+
+export type SettingRecord = {
+  [K in keyof Settings]: {
+    key: K;
+    value: Settings[K];
+  }
+}[keyof Settings];

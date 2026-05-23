@@ -1,7 +1,7 @@
 import { Message, MessageType } from "@/lib/message";
 import { db } from "@/lib/db";
 
-const activeContentScriptTabs = new Set<number>()
+const activeContentScriptTabs = new Set<number>();
 let pendingOnboarding = false;
 
 export default defineBackground(() => {
@@ -15,15 +15,15 @@ export default defineBackground(() => {
     (message: Message, sender, sendResponse) => {
       switch (message.type) {
         case MessageType.CONTENT_SCRIPT_MOUNTED:
-        if (sender.tab?.id) activeContentScriptTabs.add(sender.tab.id)
-          console.log("tab",sender.tab?.id,"joined the pool")
-        break;
+          if (sender.tab?.id) activeContentScriptTabs.add(sender.tab.id);
+          console.log("tab", sender.tab?.id, "joined the pool");
+          break;
 
         case MessageType.CONTENT_SCRIPT_UNMOUNTED:
-        if (sender.tab?.id) activeContentScriptTabs.delete(sender.tab.id)
-        console.log("tab",sender.tab?.id,"left the pool")
-        break;
-      
+          if (sender.tab?.id) activeContentScriptTabs.delete(sender.tab.id);
+          console.log("tab", sender.tab?.id, "left the pool");
+          break;
+
         case MessageType.OPEN_OPTIONS:
           browser.runtime.openOptionsPage();
           break;
@@ -38,6 +38,16 @@ export default defineBackground(() => {
             .catch(console.error);
           return true;
 
+        case MessageType.GET_PROFILE:
+          db.settings.get("profile")
+            .then((data) => {
+              const profile = data?.value ?? data ?? null;
+              console.log("sending", data);
+              sendResponse(profile);
+            })
+            .catch(console.error);
+          return true;
+
         case MessageType.OPTIONS_PAGE_READY:
           if (pendingOnboarding) {
             pendingOnboarding = false;
@@ -46,19 +56,23 @@ export default defineBackground(() => {
           break;
 
         case MessageType.WORKSPACES_UPDATED:
-          console.log("workspace updated!")
-          console.log("pool:", activeContentScriptTabs)
-          activeContentScriptTabs.forEach(tabId => {
-            browser.tabs.sendMessage(tabId, {type: MessageType.WORKSPACES_UPDATED})
-            .catch(() => {
-              activeContentScriptTabs.delete(tabId)
-              console.log("stale tab",sender.tab?.id,"flushed from the pool")
-            })
-          })
-          // browser.tabs.sendMessage({
-          //   type: MessageType.WORKSPACES_UPDATED,
-          // });
+        case MessageType.PROFILE_UPDATED: {
+          console.log(message.type);
+          console.log("pool:", activeContentScriptTabs);
+          activeContentScriptTabs.forEach((tabId) => {
+            browser.tabs
+              .sendMessage(tabId, { type: message.type })
+              .catch(() => {
+                activeContentScriptTabs.delete(tabId);
+                console.log(
+                  "stale tab",
+                  sender.tab?.id,
+                  "flushed from the pool",
+                );
+              });
+          });
           break;
+        }
 
         default:
           break;
