@@ -1,19 +1,47 @@
-
-type BlockProps = {
-  name: string;
+type LineItem = {
+  content: string;
+  isDelimiter?: boolean;
 };
 
-export default function Block({ name }: BlockProps) {
+type BlockProps = {
+  items: LineItem[][];
+  boldFirst?: boolean;
+};
+
+export default function Block({ items, boldFirst = false }: BlockProps) {
+  console.log(items);
   return (
     <>
-      <span
-        className="hover:bg-indigo-100 transition-colors duration-400 ease-in cursor-pointer"
-        onClick={async () => {
-          await navigator.clipboard.writeText(name);
-        }}
-      >
-        {name}{" "}
-      </span>
+      {items.map((line, lineIndex) => (
+        <div
+          key={lineIndex}
+          className={`inline gap-1 cursor-pointer ${boldFirst && lineIndex === 0 ? "font-semibold" : ""}`}
+        >
+          {line.map(({ content, isDelimiter = false }, itemIndex) => {
+            return (
+              <span
+                key={itemIndex}
+                className={
+                  !isDelimiter
+                    ? "hover:bg-indigo-100 transition-colors duration-75 ease-in active:bg-muted"
+                    : ""
+                }
+                onClick={
+                  !isDelimiter
+                    ? () => {
+                        navigator.clipboard.writeText(
+                          content.replace(/,/g, ""),
+                        );
+                      }
+                    : undefined
+                }
+              >
+                {content}
+              </span>
+            );
+          })}
+        </div>
+      ))}
     </>
   );
 }

@@ -38,8 +38,20 @@ export default defineBackground(() => {
             .catch(console.error);
           return true;
 
+        case MessageType.GET_WORKSPACE_DATA:
+          console.log("workspaceid", message.workspaceId)
+          db.workspaces
+            .get(message.workspaceId)
+            .then((data) => {
+              console.log("sending", data ?? null);
+              sendResponse(data);
+            })
+            .catch(console.error);
+          return true;
+
         case MessageType.GET_PROFILE:
-          db.settings.get("profile")
+          db.settings
+            .get("profile")
             .then((data) => {
               const profile = data?.value ?? data ?? null;
               console.log("sending", data);

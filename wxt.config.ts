@@ -1,13 +1,14 @@
 import { defineConfig } from "wxt";
 import { resolve } from "node:path";
 import tailwindcss from "@tailwindcss/vite";
+import svgr from "vite-plugin-svgr";
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   modules: ["@wxt-dev/module-react", "@wxt-dev/auto-icons"],
   srcDir: "src",
   vite: () => ({
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), svgr()],
   }),
   manifestVersion: 3,
   manifest: {

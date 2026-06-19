@@ -1,5 +1,3 @@
-import { Dexie } from "dexie";
-
 export interface WorkspaceMeta{
   id: string,
   name: string,
@@ -37,8 +35,14 @@ interface Education {
   schoolName: string;
   degree?: string;
   fieldOfStudy?: string;
-  startDate?: string;
-  endDate?: string;
+  startDate?: SimpleDate;
+  endDate?: SimpleDate;
+}
+
+export type SimpleDate ={
+  day?: number;
+  month: number;
+  year: number;
 }
 
 interface Experience {
@@ -47,8 +51,8 @@ interface Experience {
   title: string;
   employmentType?: string;
   location?: string;
-  startDate?: string;
-  endDate?: string;
+  startDate?: SimpleDate;
+  endDate?: SimpleDate;
   isCurrent?: boolean;
   description?: string;
 }

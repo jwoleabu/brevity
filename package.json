@@ -45,6 +45,7 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "tailwindcss": "^4.2.4",
     "typescript": "^5.9.3",
+    "vite-plugin-svgr": "^5.2.0",
     "wxt": "^0.20.25"
   }
 }

@@ -2,12 +2,15 @@ import { BriefcaseBusiness, Copy, CopyIcon, GraduationCap } from "lucide-react";
 import { ProfileSection } from "./profilesection";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
-import { WorkspaceMeta, Profile } from "@/lib/workspace";
+import { WorkspaceMeta, Profile, Workspace } from "@/lib/workspace";
 import { MessageType, Message } from "@/lib/message";
 import Block from "./block";
+import DateRange from "./range";
+import Links from "./links";
 
 export function Profile() {
   const [workspaces, setWorkspaces] = useState<WorkspaceMeta[]>([]);
+  const [workspaceData, setWorkspaceData] = useState<Workspace | null>();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [activeProfile, setActiveProfile] = useState<string | null>(null);
 
@@ -37,6 +40,19 @@ export function Profile() {
     };
     refreshProfile();
 
+    const refreshWorkspaceData = () => {
+      browser.runtime
+        .sendMessage({
+          type: MessageType.GET_WORKSPACE_DATA,
+          workspaceId: activeProfile,
+        })
+        .then((data: Workspace | null) => {
+          console.log("recieved", data);
+          setWorkspaceData(data);
+        })
+        .catch(console.error);
+    };
+
     const listener = (message: Message) => {
       console.log("profile", message);
       switch (message.type) {
@@ -49,6 +65,9 @@ export function Profile() {
           console.log("client profile updated!");
           refreshProfile();
           break;
+
+        case MessageType.WORKSPACE_DATA_UPDATED:
+          console.log("workspace data updated!");
       }
     };
 
@@ -57,12 +76,29 @@ export function Profile() {
       browser.runtime.onMessage.removeListener(listener);
     };
   }, []);
+
+  useEffect(() => {
+    if (!activeProfile) return;
+    browser.runtime
+      .sendMessage({
+        type: MessageType.GET_WORKSPACE_DATA,
+        workspaceId: activeProfile,
+      })
+      .then((data: Workspace | null) => {
+        console.log("recieved", data);
+        setWorkspaceData(data);
+      })
+      .catch(console.error);
+  }, [activeProfile]);
+
   if (!workspaces) return <p>Loading...</p>;
+  if (workspaces.length === 0 || profile == null)
+    return <p>No profiles yet.</p>;
   if (workspaces.length === 0 || profile == null)
     return <p>No profiles yet.</p>;
 
   return (
-    <div>
+    <div className="">
       <div className="flex flex-wrap gap-2 mb-5 text-sm font-extralight">
         {workspaces.map((workspace) => {
           const isActive = activeProfile === workspace.id;
@@ -74,7 +110,7 @@ export function Profile() {
                 isActive
                   ? ""
                   : "text-gray-700 ring-1 ring-indigo-400 bg-[#E6E1FF] hover:bg-[#f3f1ff]",
-                "rounded-3xl transition-none",
+                "rounded-md transition-none",
               )}
               onPointerDown={() => setActiveProfile(workspace.id)}
             >
@@ -85,42 +121,65 @@ export function Profile() {
       </div>
       <div className="flex flex-col gap-2 p-3 rounded-md bg-muted">
         <p className="text-sm flex gap-2 font-medium text-foreground">
-          <Copy size={14} />
+          <Copy size={14} className="text-indigo-400" />
           Click any text block below to copy it!
         </p>
         <p className="text-sm text-muted-foreground">
           Use your profile to fill out your application.
         </p>
       </div>
-      <div
-        className={`
-          absolute flex bottom-4 gap-2 left-1/2 -translate-x-1/2 justify-center items-center
-          bg-gray-900 text-white text-sm px-3 py-1.5 rounded-2xl
-          transition-colors duration-300
-        `}
-      >
-        <CopyIcon width={14} /> Copied text!
-      </div>
 
       <div className="p-3">
         <ProfileSection name="User">
-          <div className="rounded-full bg-indigo-300 aspect-square w-15 flex items-center justify-center text-center font-extrabold font-sans">
-            <p>{`${profile.firstName[0].toUpperCase()}${profile.lastName[0].toUpperCase()}`}</p>
+          <div className="rounded-full bg-indigo-300 aspect-square w-15 flex items-center justify-center text-center font-bold font-sans">
+            <p className="text-xl">{`${profile.firstName[0].toUpperCase()}${profile.lastName[0].toUpperCase()}`}</p>
           </div>
           <div className="flex flex-col text-sm">
-            <Block name={`${profile.firstName} ${profile.lastName}`}></Block>
-            <Block name={profile.email}></Block>
-            <Block name={profile.phone}></Block>
+            <Block
+              items={[
+                [{ content: profile.firstName }, {content: " ", isDelimiter:true}, { content: profile.lastName }],
+                [{ content: profile.email }],
+                [{ content: profile.phone }],
+              ]}
+              boldFirst={true}
+            />
           </div>
         </ProfileSection>
+
         <ProfileSection name="Education">
           <div className="rounded-full bg-indigo-300 aspect-square w-13 h-13 flex items-center justify-center text-center font-extrabold font-sans">
             <GraduationCap size={30}></GraduationCap>
           </div>
           <div className="flex flex-col text-sm">
-            <Block name="Walter White"></Block>
-            <Block name="Walter White"></Block>
-            <Block name="Walter White"></Block>
+            <Block
+              items={[
+                [
+                  {
+                    content:
+                      workspaceData?.education[0].schoolName ?? "no school",
+                  },
+                ],
+                [
+                  { content: workspaceData?.education[0].degree ?? "none" },
+                  { content: ", ", isDelimiter: true },
+                  {
+                    content: workspaceData?.education[0].fieldOfStudy ?? "none",
+                  },
+                ],
+              ]}
+              boldFirst={true}
+            />
+            <DateRange
+              startDate={
+                workspaceData?.education[0].startDate ?? {
+                  month: 3,
+                  year: 1996,
+                }
+              }
+              endDate={
+                workspaceData?.education[0].endDate ?? { month: 3, year: 1996 }
+              }
+            ></DateRange>
           </div>
         </ProfileSection>
         <ProfileSection name="Experience">
@@ -128,28 +187,42 @@ export function Profile() {
             <BriefcaseBusiness size={30}></BriefcaseBusiness>
           </div>
           <div className="flex flex-col text-sm">
-            <Block name="Walter White"></Block>
-            <Block name="Walter White"></Block>
-            <Block name="Walter White"></Block>
+            <Block
+              items={[
+                [
+                  {
+                    content:
+                      workspaceData?.experience[0].companyName ?? "no school",
+                  },
+                ],
+                [
+                  {
+                    content: workspaceData?.experience[0].title ?? "no school",
+                  },
+                  { content: " • " , isDelimiter: true},
+                  {
+                    content:
+                      workspaceData?.experience[0].location ?? "no school",
+                  },
+                ],
+              ]}
+              boldFirst={true}
+            />
+            <DateRange
+              startDate={
+                workspaceData?.education[0].startDate ?? {
+                  month: 3,
+                  year: 1996,
+                }
+              }
+              endDate={
+                workspaceData?.education[0].endDate ?? { month: 3, year: 1996 }
+              }
+            ></DateRange>
           </div>
         </ProfileSection>
         <ProfileSection name="Links">
-          <p>Sampletext</p>
-        </ProfileSection>
-        <ProfileSection name="Skills">
-          <p>Sampletext</p>
-        </ProfileSection>
-        <ProfileSection name="Links">
-          <p>Sampletext</p>
-        </ProfileSection>
-        <ProfileSection name="Links">
-          <p>Sampletext</p>
-        </ProfileSection>
-        <ProfileSection name="Links">
-          <p>Sampletext</p>
-        </ProfileSection>
-        <ProfileSection name="Links">
-          <p>Sampletext</p>
+          <Links links={workspaceData?.links ?? []} />
         </ProfileSection>
       </div>
     </div>

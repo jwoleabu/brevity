@@ -3,7 +3,8 @@ import "@/assets/styles.css";
 import { Navigation } from "@/components/views/navigation";
 import { Button } from "@/components/ui/button";
 import { Settings, X } from "lucide-react";
-import icon from "@/assets/filled_icon.svg";
+import FilledIcon from "@/assets/filled_icon_no_color.svg?react";
+
 import { MessageType } from "@/lib/message";
 
 function Extension({ onClose }: { onClose: () => void }) {
@@ -16,10 +17,10 @@ function Extension({ onClose }: { onClose: () => void }) {
     };
   }, []);
   return (
-    <div className="fixed top-0 right-0 m-3 max-h-[calc(100vh-32px)] w-full max-w-sm bg-background pr-4 pl-4 pb-4 rounded-md flex flex-col overflow-y-scroll overscroll-contain z-100000">
-      <div className="flex flex-row items-center justify-between mt-5">
+    <div className="fixed top-0 right-0 m-3 max-h-[calc(100vh-32px)] w-full max-w-sm shadow-2xs border-2 border-indigo-50 bg-background rounded-md flex flex-col z-100000">
+      <div className="flex flex-row items-center justify-between mt-5 px-4 pb-4">
         <div className="flex items-center gap-1">
-          <img src={icon} className="w-6 h-6"></img>
+          <FilledIcon className="w-6 h-6 text-indigo-400" />
           <p className="font-medium">Brevity</p>
         </div>
         <div className="flex gap-2">
@@ -41,8 +42,10 @@ function Extension({ onClose }: { onClose: () => void }) {
           </Button>
         </div>
       </div>
-      <Navigation />
-      <Toaster position="bottom-left" duration={1500}/>
+      <div className="overflow-y-auto overscroll-contain px-4 pb-4 [scrollbar-gutter:stable_both-edges]">
+        <Navigation />
+      </div>
+      <Toaster position="bottom-left" duration={1500} />
     </div>
   );
 }
