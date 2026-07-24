@@ -1,5 +1,9 @@
 import { createRoot } from "react-dom/client";
 import App from "./app";
-import "@/assets/styles.css"
+import "@/assets/styles.css";
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+	throw new Error("Root element #root not found in index.html");
+}
+createRoot(rootElement).render(<App />);
