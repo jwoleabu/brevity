@@ -9,10 +9,36 @@ import { ProfileSection } from "./profilesection";
 import DateRange from "./range";
 
 export function ProfilePage() {
+	const [visible, setVisible] = useState(false);
+	const [leaving, setLeaving] = useState(false);
+	const [instant, setInstant] = useState(false);
+	const hideTimer = useRef<NodeJS.Timeout | null>(null);
+	const unmountTimer = useRef<NodeJS.Timeout | null>(null);
 	const [workspaces, setWorkspaces] = useState<WorkspaceMeta[]>([]);
 	const [workspaceData, setWorkspaceData] = useState<Workspace | null>();
 	const [profile, setProfile] = useState<Profile | null>(null);
 	const [activeProfile, setActiveProfile] = useState<string | null>(null);
+
+	function copynotify() {
+		if (hideTimer?.current) clearTimeout(hideTimer.current);
+		if (unmountTimer?.current) clearTimeout(unmountTimer.current);
+		setVisible(true);
+
+		if (leaving) {
+			setInstant(true);
+			setLeaving(false);
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => setInstant(false));
+			});
+		} else {
+			setLeaving(false);
+		}
+
+		hideTimer.current = setTimeout(() => {
+			setLeaving(true);
+			unmountTimer.current = setTimeout(() => setVisible(false), 500);
+		}, 1000);
+	}
 
 	useEffect(() => {
 		const refresh = () => {
@@ -147,6 +173,7 @@ export function ProfilePage() {
 								[{ content: profile.phone }],
 							]}
 							boldFirst={true}
+							notify={copynotify}
 						/>
 					</div>
 				</ProfileSection>
@@ -173,6 +200,7 @@ export function ProfilePage() {
 								],
 							]}
 							boldFirst={true}
+							notify={copynotify}
 						/>
 						<DateRange
 							startDate={
@@ -184,6 +212,7 @@ export function ProfilePage() {
 							endDate={
 								workspaceData?.education[0].endDate ?? { month: 3, year: 1996 }
 							}
+							notify={copynotify}
 						></DateRange>
 					</div>
 				</ProfileSection>
@@ -212,6 +241,7 @@ export function ProfilePage() {
 								],
 							]}
 							boldFirst={true}
+							notify={copynotify}
 						/>
 						<DateRange
 							startDate={
@@ -223,13 +253,28 @@ export function ProfilePage() {
 							endDate={
 								workspaceData?.education[0].endDate ?? { month: 3, year: 1996 }
 							}
+							notify={copynotify}
 						></DateRange>
 					</div>
 				</ProfileSection>
 				<ProfileSection name="Links">
-					<Links links={workspaceData?.links ?? []} />
+					<Links links={workspaceData?.links ?? []} notify={copynotify} />
 				</ProfileSection>
 			</div>
+			{visible && <Popup leaving={leaving} instant={instant} />}
+		</div>
+	);
+}
+
+function Popup({ leaving, instant }: { leaving: boolean; instant: boolean }) {
+	return (
+		<div
+			className={`absolute flex bottom-3 items-center gap-2 left-1/2 -translate-x-1/2 rounded-2xl px-2 py-1 bg-indigo-300 pointer-events-none
+        ${instant ? "" : "[transition:opacity_0.5s,translate_0.5s]"} ease-in
+        ${leaving ? "-translate-y-3 opacity-0" : "translate-y-0 opacity-100"}`}
+		>
+			<Copy size={14} />
+			<span className="text-sm">Copied to clipboard!</span>
 		</div>
 	);
 }

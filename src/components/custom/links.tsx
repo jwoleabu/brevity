@@ -7,6 +7,7 @@ import type { Link } from "@/lib/workspace";
 
 type LinkProps = {
 	links: Link[];
+	notify: () => void;
 };
 
 const domainIconMap = new Map<string, JSX.Element>([
@@ -23,7 +24,7 @@ function UrlToIcon(url: string): JSX.Element {
 	);
 }
 
-export default function Links({ links }: LinkProps) {
+export default function Links({ links, notify }: LinkProps) {
 	console.log("howdy", links);
 	return (
 		<div className="flex flex-col gap-1.5 w-full">
@@ -33,6 +34,7 @@ export default function Links({ links }: LinkProps) {
 					key={link.id}
 					className="flex items-center gap-2 bg-muted rounded-lg p-1 text-sm transition-colors ease-in duration-75 hover:bg-indigo-100 cursor-pointer active:bg-muted"
 					onClick={() => {
+						notify();
 						navigator.clipboard.writeText(`https://${link.url.toString()}`);
 					}}
 				>
