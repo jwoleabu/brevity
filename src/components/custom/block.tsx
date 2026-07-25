@@ -6,9 +6,14 @@ type LineItem = {
 type BlockProps = {
 	items: LineItem[][];
 	boldFirst?: boolean;
+	notify: () => void;
 };
 
-export default function Block({ items, boldFirst = false }: BlockProps) {
+export default function Block({
+	items,
+	boldFirst = false,
+	notify,
+}: BlockProps) {
 	console.log(items);
 	return (
 		<>
@@ -35,6 +40,7 @@ export default function Block({ items, boldFirst = false }: BlockProps) {
 								type="button"
 								className="appearance-none bg-transparent cursor-pointer border-0 p-0 m-0 font-inherit text-inherit hover:bg-indigo-100 transition-colors duration-75 ease-in active:bg-muted"
 								onClick={() => {
+									notify();
 									navigator.clipboard.writeText(content.replace(/,/g, ""));
 								}}
 							>

@@ -33,9 +33,10 @@ const MONTHS_SHORT: Record<number, string> = {
 type RangeProps = {
 	startDate: SimpleDate;
 	endDate: SimpleDate;
+	notify: () => void;
 };
 
-export default function DateRange({ startDate, endDate }: RangeProps) {
+export default function DateRange({ startDate, endDate, notify }: RangeProps) {
 	return (
 		<div className="inline w-fit cursor-pointer">
 			{/* <span>
@@ -45,6 +46,7 @@ export default function DateRange({ startDate, endDate }: RangeProps) {
 				type="button"
 				className="hover:bg-indigo-100 transition-colors duration-75 ease-in"
 				onClick={() => {
+					notify();
 					navigator.clipboard.writeText(MONTHS[startDate.month]);
 				}}
 			>
@@ -55,6 +57,7 @@ export default function DateRange({ startDate, endDate }: RangeProps) {
 				type="button"
 				className="hover:bg-indigo-100 transition-colors duration-75 ease-in"
 				onClick={() => {
+					notify();
 					navigator.clipboard.writeText(startDate.year.toString());
 				}}
 			>
@@ -65,6 +68,7 @@ export default function DateRange({ startDate, endDate }: RangeProps) {
 				type="button"
 				className="hover:bg-indigo-100 transition-colors duration-75 ease-in"
 				onClick={() => {
+					notify();
 					navigator.clipboard.writeText(MONTHS[endDate.month]);
 				}}
 			>
@@ -75,6 +79,7 @@ export default function DateRange({ startDate, endDate }: RangeProps) {
 				type="button"
 				className="hover:bg-indigo-100 transition-colors duration-75 ease-in"
 				onClick={() => {
+					notify();
 					navigator.clipboard.writeText(endDate.year.toString());
 				}}
 			>
