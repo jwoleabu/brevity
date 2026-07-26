@@ -140,6 +140,12 @@ export function ProfilePage() {
 								"rounded-md transition-none",
 							)}
 							onPointerDown={() => setActiveProfile(workspace.id)}
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									e.preventDefault();
+									setActiveProfile(workspace.id);
+								}
+							}}
 						>
 							{workspace.name}
 						</Button>
