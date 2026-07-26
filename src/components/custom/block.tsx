@@ -21,31 +21,44 @@ export default function Block({
 			{items.map((line, lineIndex) => (
 				<div
 					key={lineIndex}
-					className={`inline gap-1 cursor-pointer ${boldFirst && lineIndex === 0 ? "font-semibold" : ""}`}
+					className={`inline gap-1 ${boldFirst && lineIndex === 0 ? "font-semibold" : ""}`}
 				>
 					{line.map((item, itemIndex) => {
 						const { content, isDelimiter = false } = item;
 
 						if (isDelimiter) {
 							return (
-								<span key={itemIndex} aria-hidden="true">
+								<span
+									key={itemIndex}
+									aria-hidden="true"
+									className="cursor-pointer"
+								>
 									{content}
 								</span>
 							);
 						}
 
 						return (
-							<button
+							// biome-ignore lint/a11y/useSemanticElements: a span is required to render inline text
+							<span
 								key={itemIndex}
-								type="button"
-								className="appearance-none bg-transparent cursor-pointer border-0 p-0 m-0 font-inherit text-inherit hover:bg-indigo-100 transition-colors duration-75 ease-in active:bg-muted"
+								role="button"
+								tabIndex={0}
+								className="appearance-none inline bg-transparent cursor-pointer border-0 p-0 m-0 font-inherit text-left text-inherit hover:bg-indigo-100 transition-colors duration-75 ease-in active:bg-muted"
 								onClick={() => {
 									notify();
 									navigator.clipboard.writeText(content.replace(/,/g, ""));
 								}}
+								onKeyDown={(e) => {
+									if (e.key === "Enter" || e.key === " ") {
+										e.preventDefault();
+										notify();
+										navigator.clipboard.writeText(content);
+									}
+								}}
 							>
 								{content}
-							</button>
+							</span>
 						);
 					})}
 				</div>

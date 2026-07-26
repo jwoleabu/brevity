@@ -158,7 +158,7 @@ export function ProfilePage() {
 
 			<div className="p-3">
 				<ProfileSection name="User">
-					<div className="rounded-full bg-indigo-300 aspect-square w-15 flex items-center justify-center text-center font-bold font-sans">
+					<div className="rounded-full bg-indigo-300 aspect-square w-15 h-15 flex items-center justify-center text-center font-bold font-sans">
 						<p className="text-xl">{`${profile.firstName[0].toUpperCase()}${profile.lastName[0].toUpperCase()}`}</p>
 					</div>
 					<div className="flex flex-col text-sm">
