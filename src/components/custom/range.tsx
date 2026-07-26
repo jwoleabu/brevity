@@ -49,7 +49,7 @@ export default function DateRange({ startDate, endDate, notify }: RangeProps) {
 					navigator.clipboard.writeText(MONTHS[startDate.month]);
 				}}
 				onKeyDown={(e) => {
-					if (e.key === "Enter" || e.key === " ") {
+					if ((e.key === "Enter" || e.key === " ") && !e.repeat) {
 						e.preventDefault();
 						notify();
 						navigator.clipboard.writeText(MONTHS[startDate.month]);
@@ -68,7 +68,7 @@ export default function DateRange({ startDate, endDate, notify }: RangeProps) {
 					navigator.clipboard.writeText(startDate.year.toString());
 				}}
 				onKeyDown={(e) => {
-					if (e.key === "Enter" || e.key === " ") {
+					if ((e.key === "Enter" || e.key === " ") && !e.repeat) {
 						e.preventDefault();
 						notify();
 						navigator.clipboard.writeText(startDate.year.toString());
@@ -87,7 +87,7 @@ export default function DateRange({ startDate, endDate, notify }: RangeProps) {
 					navigator.clipboard.writeText(MONTHS[endDate.month]);
 				}}
 				onKeyDown={(e) => {
-					if (e.key === "Enter" || e.key === " ") {
+					if ((e.key === "Enter" || e.key === " ") && !e.repeat) {
 						e.preventDefault();
 						notify();
 						navigator.clipboard.writeText(MONTHS[endDate.month]);
@@ -106,7 +106,7 @@ export default function DateRange({ startDate, endDate, notify }: RangeProps) {
 					navigator.clipboard.writeText(endDate.year.toString());
 				}}
 				onKeyDown={(e) => {
-					if (e.key === "Enter" || e.key === " ") {
+					if ((e.key === "Enter" || e.key === " ") && !e.repeat) {
 						e.preventDefault();
 						notify();
 						navigator.clipboard.writeText(endDate.year.toString());

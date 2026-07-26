@@ -50,7 +50,7 @@ export default function Block({
 									navigator.clipboard.writeText(content.replace(/,/g, ""));
 								}}
 								onKeyDown={(e) => {
-									if (e.key === "Enter" || e.key === " ") {
+									if ((e.key === "Enter" || e.key === " ") && !e.repeat) {
 										e.preventDefault();
 										notify();
 										navigator.clipboard.writeText(content);

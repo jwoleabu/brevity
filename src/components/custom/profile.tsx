@@ -141,7 +141,7 @@ export function ProfilePage() {
 							)}
 							onPointerDown={() => setActiveProfile(workspace.id)}
 							onKeyDown={(e) => {
-								if (e.key === "Enter" || e.key === " ") {
+								if ((e.key === "Enter" || e.key === " ") && !e.repeat) {
 									e.preventDefault();
 									setActiveProfile(workspace.id);
 								}
