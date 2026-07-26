@@ -38,53 +38,84 @@ type RangeProps = {
 
 export default function DateRange({ startDate, endDate, notify }: RangeProps) {
 	return (
-		<div className="inline w-fit cursor-pointer">
-			{/* <span>
-        {`${MONTHS_SHORT[startDate.month]} ${startDate.year} - ${MONTHS_SHORT[endDate.month]} ${endDate.year}`}
-      </span> */}
-			<button
-				type="button"
-				className="hover:bg-indigo-100 transition-colors duration-75 ease-in"
+		<div className="inline w-fit">
+			{/** biome-ignore-start lint/a11y/useSemanticElements: a span is required to render inline text  */}
+			<span
+				role="button"
+				tabIndex={0}
+				className="cursor-pointer hover:bg-indigo-100 transition-colors duration-75 ease-in"
 				onClick={() => {
 					notify();
 					navigator.clipboard.writeText(MONTHS[startDate.month]);
 				}}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						notify();
+						navigator.clipboard.writeText(MONTHS[startDate.month]);
+					}
+				}}
 			>
 				{MONTHS_SHORT[startDate.month]}
-			</button>
-			<span>{` `}</span>
-			<button
-				type="button"
-				className="hover:bg-indigo-100 transition-colors duration-75 ease-in"
+			</span>
+			<span className="cursor-pointer">{` `}</span>
+			<span
+				role="button"
+				tabIndex={0}
+				className="cursor-pointer hover:bg-indigo-100 transition-colors duration-75 ease-in"
 				onClick={() => {
 					notify();
 					navigator.clipboard.writeText(startDate.year.toString());
 				}}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						notify();
+						navigator.clipboard.writeText(startDate.year.toString());
+					}
+				}}
 			>
 				{startDate.year}
-			</button>
-			<span>{` - `}</span>
-			<button
-				type="button"
-				className="hover:bg-indigo-100 transition-colors duration-75 ease-in"
+			</span>
+			<span className="cursor-pointer">{` - `}</span>
+			<span
+				role="button"
+				tabIndex={0}
+				className="cursor-pointer hover:bg-indigo-100 transition-colors duration-75 ease-in"
 				onClick={() => {
 					notify();
 					navigator.clipboard.writeText(MONTHS[endDate.month]);
 				}}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						notify();
+						navigator.clipboard.writeText(MONTHS[endDate.month]);
+					}
+				}}
 			>
 				{MONTHS_SHORT[endDate.month]}
-			</button>
-			<span>{` `}</span>
-			<button
-				type="button"
-				className="hover:bg-indigo-100 transition-colors duration-75 ease-in"
+			</span>
+			<span className="cursor-pointer">{` `}</span>
+			<span
+				role="button"
+				tabIndex={0}
+				className="cursor-pointer hover:bg-indigo-100 transition-colors duration-75 ease-in"
 				onClick={() => {
 					notify();
 					navigator.clipboard.writeText(endDate.year.toString());
 				}}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						notify();
+						navigator.clipboard.writeText(endDate.year.toString());
+					}
+				}}
 			>
 				{endDate.year}
-			</button>
+			</span>
+			{/** biome-ignore-end lint/a11y/useSemanticElements: a span is required to render inline text  */}
 		</div>
 	);
 }
