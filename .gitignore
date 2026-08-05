@@ -36,3 +36,8 @@ web-ext.config.ts
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# Mocked Application Data
+public/mock/*
+
+.env.local

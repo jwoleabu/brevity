@@ -42,7 +42,9 @@ function Extension({ onClose }: { onClose: () => void }) {
 					</Button>
 				</div>
 			</div>
-			<div className="overflow-y-auto overscroll-contain px-4 pb-4 [scrollbar-gutter:stable_both-edges]">
+			<div
+				className={`overflow-y-auto overscroll-contain [scrollbar-color:var(--color-gray-400)_transparent] [scrollbar-gutter:stable_both-edges] ${import.meta.env.CHROME ? "[scrollbar-width:thin] px-4 pb-4" : "px-7 pb-7"}`}
+			>
 				<Navigation />
 			</div>
 			<Toaster position="bottom-left" duration={1500} />

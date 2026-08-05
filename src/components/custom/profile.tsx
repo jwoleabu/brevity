@@ -1,12 +1,18 @@
-import { BriefcaseBusiness, Copy, GraduationCap } from "lucide-react";
+import { Copy, Eye, FileText } from "lucide-react";
 import { type Message, MessageType } from "@/lib/message";
 import { cn } from "@/lib/utils";
-import type { Profile, Workspace, WorkspaceMeta } from "@/lib/workspace";
-import { Button } from "../ui/button";
+import type {
+	Profile,
+	ResumeObject,
+	Workspace,
+	WorkspaceMeta,
+} from "@/lib/workspace";
 import Block from "./block";
+import ProfileEducation from "./education";
+import ProfileExperience from "./experience";
 import Links from "./links";
 import { ProfileSection } from "./profilesection";
-import DateRange from "./range";
+import Skills from "./skills";
 
 export function ProfilePage() {
 	const [visible, setVisible] = useState(false);
@@ -18,6 +24,7 @@ export function ProfilePage() {
 	const [workspaceData, setWorkspaceData] = useState<Workspace | null>();
 	const [profile, setProfile] = useState<Profile | null>(null);
 	const [activeProfile, setActiveProfile] = useState<string | null>(null);
+	const [resume, setResume] = useState<ResumeObject | null>(null);
 
 	function copynotify() {
 		if (hideTimer?.current) clearTimeout(hideTimer.current);
@@ -118,11 +125,26 @@ export function ProfilePage() {
 			.catch(console.error);
 	}, [activeProfile]);
 
+	useEffect(() => {
+		if (workspaceData?.resume === undefined || workspaceData.resume === "")
+			return;
+		const id = workspaceData?.resume;
+
+		browser.runtime
+			.sendMessage({
+				type: MessageType.HAS_BLOB,
+				id: id,
+			})
+			.then((data: ResumeObject) => {
+				setResume(data);
+				console.log("file exists?", data);
+			})
+			.catch(console.error);
+	}, [workspaceData]);
+
 	if (!workspaces) return <p>Loading...</p>;
-	if (workspaces.length === 0 || profile == null)
-		return <p>No profiles yet.</p>;
-	if (workspaces.length === 0 || profile == null)
-		return <p>No profiles yet.</p>;
+	if (profile === null) return <p>No profiles yet.</p>;
+	if (workspaces.length === 0) return <p>No workspaces yet.</p>;
 
 	return (
 		<div className="">
@@ -130,14 +152,14 @@ export function ProfilePage() {
 				{workspaces.map((workspace) => {
 					const isActive = activeProfile === workspace.id;
 					return (
-						<Button
+						<button
+							type="button"
 							key={workspace.id}
-							size="sm"
 							className={cn(
 								isActive
-									? ""
-									: "text-gray-700 ring-1 ring-indigo-400 bg-[#E6E1FF] hover:bg-[#f3f1ff]",
-								"rounded-md transition-none",
+									? "text-white [border-width:thin] border-black bg-black"
+									: "text-gray-700 [border-width:thin] border-indigo-400 bg-[#E6E1FF] hover:bg-[#f3f1ff]",
+								"text-sm font-semibold appearance-none rounded-md transition-none py-1 px-2",
 							)}
 							onPointerDown={() => setActiveProfile(workspace.id)}
 							onKeyDown={(e) => {
@@ -148,7 +170,7 @@ export function ProfilePage() {
 							}}
 						>
 							{workspace.name}
-						</Button>
+						</button>
 					);
 				})}
 			</div>
@@ -157,14 +179,14 @@ export function ProfilePage() {
 					<Copy size={14} className="text-indigo-400" />
 					Click any text block below to copy it!
 				</p>
-				<p className="text-sm text-muted-foreground">
+				<p className="text-sm text-gray-600">
 					Use your profile to fill out your application.
 				</p>
 			</div>
 
 			<div className="p-3">
 				<ProfileSection name="User">
-					<div className="rounded-full bg-indigo-300 aspect-square w-15 h-15 flex items-center justify-center text-center font-bold font-sans">
+					<div className="rounded-full bg-indigo-300 aspect-square w-11 h-11 flex items-center justify-center text-center font-bold font-sans">
 						<p className="text-xl">{`${profile.firstName[0].toUpperCase()}${profile.lastName[0].toUpperCase()}`}</p>
 					</div>
 					<div className="flex flex-col text-sm">
@@ -183,89 +205,66 @@ export function ProfilePage() {
 						/>
 					</div>
 				</ProfileSection>
+				{workspaceData?.education?.length ? (
+					<ProfileEducation edu={workspaceData.education} notify={copynotify} />
+				) : null}
 
-				<ProfileSection name="Education">
-					<div className="rounded-full bg-indigo-300 aspect-square w-13 h-13 flex items-center justify-center text-center font-extrabold font-sans">
-						<GraduationCap size={30}></GraduationCap>
-					</div>
-					<div className="flex flex-col text-sm">
-						<Block
-							items={[
-								[
-									{
-										content:
-											workspaceData?.education[0].schoolName ?? "no school",
-									},
-								],
-								[
-									{ content: workspaceData?.education[0].degree ?? "none" },
-									{ content: ", ", isDelimiter: true },
-									{
-										content: workspaceData?.education[0].fieldOfStudy ?? "none",
-									},
-								],
-							]}
-							boldFirst={true}
-							notify={copynotify}
-						/>
-						<DateRange
-							startDate={
-								workspaceData?.education[0].startDate ?? {
-									month: 3,
-									year: 1996,
-								}
-							}
-							endDate={
-								workspaceData?.education[0].endDate ?? { month: 3, year: 1996 }
-							}
-							notify={copynotify}
-						></DateRange>
-					</div>
-				</ProfileSection>
-				<ProfileSection name="Experience">
-					<div className="rounded-full bg-indigo-300 aspect-square w-13 h-13 flex items-center justify-center text-center font-extrabold font-sans">
-						<BriefcaseBusiness size={30}></BriefcaseBusiness>
-					</div>
-					<div className="flex flex-col text-sm">
-						<Block
-							items={[
-								[
-									{
-										content:
-											workspaceData?.experience[0].companyName ?? "no school",
-									},
-								],
-								[
-									{
-										content: workspaceData?.experience[0].title ?? "no school",
-									},
-									{ content: " • ", isDelimiter: true },
-									{
-										content:
-											workspaceData?.experience[0].location ?? "no school",
-									},
-								],
-							]}
-							boldFirst={true}
-							notify={copynotify}
-						/>
-						<DateRange
-							startDate={
-								workspaceData?.education[0].startDate ?? {
-									month: 3,
-									year: 1996,
-								}
-							}
-							endDate={
-								workspaceData?.education[0].endDate ?? { month: 3, year: 1996 }
-							}
-							notify={copynotify}
-						></DateRange>
-					</div>
-				</ProfileSection>
+				{workspaceData?.experience?.length ? (
+					<ProfileExperience
+						exp={workspaceData.experience}
+						notify={copynotify}
+					/>
+				) : null}
+
+				{resume ? (
+					<ProfileSection name="Uploads">
+						<div className="rounded-full bg-indigo-300 aspect-square w-11 h-11 flex items-center justify-center text-center font-extrabold font-sans">
+							<FileText size={28} />
+						</div>
+						<div className="flex flex-col text-sm">
+							<p className="font-semibold">Resume</p>
+							<p className="text-gray-600">
+								Uploaded:{" "}
+								{new Date(resume.uploadedAt).toLocaleString(undefined, {
+									year: "numeric",
+									month: "numeric",
+									day: "numeric",
+									hour: "numeric",
+									minute: "2-digit",
+									second: "2-digit",
+								})}
+							</p>{" "}
+							<button
+								onClick={() => preview(resume.id)}
+								type="button"
+								className="flex items-center gap-1 text-indigo-800 w-fit hover:cursor-pointer"
+							>
+								<Eye size={14} />
+								<p>Preview</p>
+							</button>
+						</div>
+					</ProfileSection>
+				) : null}
+
 				<ProfileSection name="Links">
 					<Links links={workspaceData?.links ?? []} notify={copynotify} />
 				</ProfileSection>
+
+				{workspaceData?.skills?.length ? (
+					<Skills
+						name="Skills"
+						skills={workspaceData.skills}
+						notify={copynotify}
+					/>
+				) : null}
+
+				{workspaceData?.languages?.length ? (
+					<Skills
+						name="Languages"
+						skills={workspaceData.languages}
+						notify={copynotify}
+					/>
+				) : null}
 			</div>
 			{visible && <Popup leaving={leaving} instant={instant} />}
 		</div>
@@ -283,4 +282,11 @@ function Popup({ leaving, instant }: { leaving: boolean; instant: boolean }) {
 			<span className="text-sm">Copied to clipboard!</span>
 		</div>
 	);
+}
+
+export function preview(id: string) {
+	browser.runtime.sendMessage({
+		type: MessageType.PREVIEW,
+		id: id,
+	});
 }

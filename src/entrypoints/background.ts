@@ -1,7 +1,9 @@
 import { db } from "@/lib/db";
 import { type Message, MessageType } from "@/lib/message";
+import type { ResumeObject } from "@/lib/workspace";
 
 const activeContentScriptTabs = new Set<number>();
+
 let pendingOnboarding = false;
 
 export default defineBackground(() => {
@@ -28,6 +30,12 @@ export default defineBackground(() => {
 					browser.runtime.openOptionsPage();
 					break;
 
+				case MessageType.PREVIEW:
+					browser.tabs.create({
+						url: browser.runtime.getURL(`/preview.html?id=${message.id}`),
+					});
+					break;
+
 				case MessageType.GET_WORKSPACES_META:
 					db.workspaceMeta
 						.toArray()
@@ -45,6 +53,23 @@ export default defineBackground(() => {
 						.then((data) => {
 							console.log("sending", data ?? null);
 							sendResponse(data);
+						})
+						.catch(console.error);
+					return true;
+
+				case MessageType.HAS_BLOB:
+					db.uploads
+						.get(message.id)
+						.then((data) => {
+							if (data) {
+								const resume: ResumeObject = {
+									id: data.id,
+									uploadedAt: data.createdAt,
+								};
+								sendResponse(resume);
+							} else {
+								sendResponse(null);
+							}
 						})
 						.catch(console.error);
 					return true;

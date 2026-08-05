@@ -11,6 +11,8 @@ export enum MessageType {
 	WORKSPACES_UPDATED = "WORKSPACES_UPDATED",
 	PROFILE_UPDATED = "PROFILE_UPDATED",
 	WORKSPACE_DATA_UPDATED = "WORKSPACE_DATA_UPDATED",
+	HAS_BLOB = "HAS_BLOB",
+	PREVIEW = "PREVIEW",
 	CONTENT_SCRIPT_MOUNTED = "CONTENT_SCRIPT_MOUNTED",
 	CONTENT_SCRIPT_UNMOUNTED = "CONTENT_SCRIPT_UNMOUNTED",
 }
@@ -26,6 +28,8 @@ export type Message =
 	| { type: typeof MessageType.GET_PROFILE }
 	| { type: typeof MessageType.WORKSPACES_UPDATED }
 	| { type: typeof MessageType.WORKSPACE_DATA_UPDATED; workspaceId: string }
+	| { type: typeof MessageType.HAS_BLOB; id: string }
+	| { type: typeof MessageType.PREVIEW; id: string }
 	| { type: typeof MessageType.PROFILE_UPDATED }
 	| { type: typeof MessageType.CONTENT_SCRIPT_MOUNTED }
 	| { type: typeof MessageType.CONTENT_SCRIPT_UNMOUNTED };

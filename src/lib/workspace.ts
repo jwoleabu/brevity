@@ -8,13 +8,15 @@ export interface WorkspaceMeta {
 export interface Workspace {
 	id: string;
 	name: string;
+	resume?: string;
 
 	profileOverride?: Partial<Profile>;
 
 	education: Education[];
 	experience: Experience[];
 	links: Link[];
-
+	skills: Skill[];
+	languages: Language[];
 	createdAt: number;
 	updatedAt: number;
 }
@@ -30,13 +32,13 @@ export interface Profile {
 	phone: string;
 }
 
-interface Education {
+export interface Education {
 	id: string;
 	schoolName: string;
-	degree?: string;
-	fieldOfStudy?: string;
-	startDate?: SimpleDate;
-	endDate?: SimpleDate;
+	degree: string;
+	fieldOfStudy: string;
+	startDate: SimpleDate;
+	endDate: SimpleDate;
 }
 
 export type SimpleDate = {
@@ -45,15 +47,15 @@ export type SimpleDate = {
 	year: number;
 };
 
-interface Experience {
+export interface Experience {
 	id: string;
 	companyName: string;
 	title: string;
-	employmentType?: string;
-	location?: string;
-	startDate?: SimpleDate;
-	endDate?: SimpleDate;
-	isCurrent?: boolean;
+	employmentType: string;
+	location: string;
+	startDate: SimpleDate;
+	endDate: SimpleDate;
+	isCurrent: boolean;
 	description?: string;
 }
 
@@ -63,9 +65,32 @@ export interface Link {
 	url: string;
 }
 
+export interface Skill {
+	id: string;
+	name: string;
+}
+
+export interface Language {
+	id: string;
+	name: string;
+}
+
 export type SettingRecord = {
 	[K in keyof Settings]: {
 		key: K;
 		value: Settings[K];
 	};
 }[keyof Settings];
+
+export interface Upload {
+	id: string;
+	name: string;
+	createdAt: number;
+	updatedAt: number;
+	blob: Blob;
+}
+
+export type ResumeObject = {
+	id: string;
+	uploadedAt: number;
+};

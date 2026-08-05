@@ -6,12 +6,14 @@ type LineItem = {
 type BlockProps = {
 	items: LineItem[][];
 	boldFirst?: boolean;
+	contrast?: boolean;
 	notify: () => void;
 };
 
 export default function Block({
 	items,
 	boldFirst = false,
+	contrast = false,
 	notify,
 }: BlockProps) {
 	console.log(items);
@@ -31,7 +33,7 @@ export default function Block({
 								<span
 									key={itemIndex}
 									aria-hidden="true"
-									className="cursor-pointer"
+									className={`cursor-pointer ${contrast && lineIndex > 0 ? "text-gray-600" : "text-inherit"}`}
 								>
 									{content}
 								</span>
@@ -44,7 +46,7 @@ export default function Block({
 								key={itemIndex}
 								role="button"
 								tabIndex={0}
-								className="appearance-none inline bg-transparent cursor-pointer border-0 p-0 m-0 font-inherit text-left text-inherit hover:bg-indigo-100 transition-colors duration-75 ease-in active:bg-muted"
+								className={`appearance-none inline bg-transparent cursor-pointer border-0 p-0 m-0 font-inherit text-left hover:bg-indigo-100 transition-colors duration-75 ease-in active:bg-muted ${contrast && lineIndex > 0 ? "text-gray-600" : "text-inherit"}`}
 								onClick={() => {
 									notify();
 									navigator.clipboard.writeText(content.replace(/,/g, ""));

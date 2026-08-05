@@ -7,7 +7,7 @@ export function Navigation() {
 	return (
 		<Tabs defaultValue="autofill" className="w-full flex flex-col">
 			<div className="bg-white sticky top-0 w-f pt-4 pb-1 mb-1">
-				<TabsList className="w-full h-[2.5em]">
+				<TabsList className="w-full h-[2.5em] text-gray-600">
 					<TabsTrigger
 						value="autofill"
 						className="w-full flex gap-2 text-sm data-[state=active]:text-indigo-800"

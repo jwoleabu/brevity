@@ -33,12 +33,18 @@ const MONTHS_SHORT: Record<number, string> = {
 type RangeProps = {
 	startDate: SimpleDate;
 	endDate: SimpleDate;
+	contrast?: boolean;
 	notify: () => void;
 };
 
-export default function DateRange({ startDate, endDate, notify }: RangeProps) {
+export default function DateRange({
+	startDate,
+	endDate,
+	notify,
+	contrast = false,
+}: RangeProps) {
 	return (
-		<div className="inline w-fit">
+		<div className={`inline w-fit  ${contrast ? "text-gray-600" : ""}`}>
 			{/** biome-ignore-start lint/a11y/useSemanticElements: a span is required to render inline text  */}
 			<span
 				role="button"
