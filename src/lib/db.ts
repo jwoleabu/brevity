@@ -1,8 +1,10 @@
 import Dexie, { type Table } from "dexie";
+import type { PublicPath } from "wxt/browser";
 import type {
 	Profile,
 	SettingRecord,
 	Settings,
+	Upload,
 	Workspace,
 	WorkspaceMeta,
 } from "./workspace";
@@ -11,17 +13,57 @@ class BrevityDB extends Dexie {
 	workspaces!: Table<Workspace, string>;
 	workspaceMeta!: Table<WorkspaceMeta, string>;
 	settings!: Table<SettingRecord, keyof Settings>;
+	uploads!: Table<Upload, string>;
 	constructor() {
 		super("BrevityDB");
 		this.version(1).stores({
 			workspaces: "id, name, createdAt, updatedAt",
 			workspaceMeta: "id, updatedAt",
 			settings: "key",
+			uploads: "id, name, createdAt, updatedAt",
 		});
 	}
 }
 
 export const db = new BrevityDB();
+
+export async function createMockWorkspace(name: string): Promise<Workspace> {
+	const url = browser.runtime.getURL(
+		`/mock/workspaces/${name}.json` as PublicPath,
+	);
+	const response = await fetch(url);
+
+	if (!response.ok) {
+		throw new Error(`No workspace template found for "${name}" (${url})`);
+	}
+	const template = (await response.json()) as Workspace;
+
+	await db.transaction("rw", db.workspaces, db.workspaceMeta, async () => {
+		await db.workspaces.add(template);
+		await db.workspaceMeta.add({
+			id: template.id,
+			name,
+			updatedAt: template.updatedAt,
+			createdAt: template.createdAt,
+		});
+	});
+
+	return template;
+}
+
+export async function createMockUser(name: string): Promise<Profile> {
+	const url = browser.runtime.getURL(`/mock/users/${name}.json` as PublicPath);
+	const response = await fetch(url);
+
+	if (!response.ok) {
+		throw new Error(`No user template found for "${name}" (${url})`);
+	}
+	const template = (await response.json()) as Profile;
+
+	await db.settings.put({ key: "profile", value: template });
+
+	return template;
+}
 
 export async function createNewWorkspace(name: string): Promise<Workspace> {
 	const now = Date.now();
@@ -64,6 +106,15 @@ export async function createNewWorkspace(name: string): Promise<Workspace> {
 				url: "leetcode.com/meandstuff",
 			},
 			{ id: crypto.randomUUID(), label: "itch.io", url: "username.itch.io" },
+		],
+		skills: [
+			{ id: crypto.randomUUID(), name: "github" },
+			{ id: crypto.randomUUID(), name: "linkedin" },
+			{ id: crypto.randomUUID(), name: "portfolio" },
+		],
+		languages: [
+			{ id: crypto.randomUUID(), name: "french" },
+			{ id: crypto.randomUUID(), name: "english" },
 		],
 	};
 
