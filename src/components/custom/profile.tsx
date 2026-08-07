@@ -1,5 +1,5 @@
 import { Copy, Eye, FileText } from "lucide-react";
-import { type Message, MessageType } from "@/lib/message";
+import { onMessage, sendMessage } from "@/lib/message";
 import { cn } from "@/lib/utils";
 import type {
 	Profile,
@@ -49,10 +49,9 @@ export function ProfilePage() {
 
 	useEffect(() => {
 		const refresh = () => {
-			browser.runtime
-				.sendMessage({ type: MessageType.GET_WORKSPACES_META })
-				.then((data: WorkspaceMeta[]) => {
-					console.log("recieved", data);
+			sendMessage("GET_WORKSPACES_META")
+				.then((data) => {
+					console.log(`recieved ${data}`);
 					setWorkspaces(data);
 					if (activeProfile === null && data.length > 0) {
 						setActiveProfile(data[0].id);
@@ -63,10 +62,9 @@ export function ProfilePage() {
 		refresh();
 
 		const refreshProfile = () => {
-			browser.runtime
-				.sendMessage({ type: MessageType.GET_PROFILE })
-				.then((data: Profile | null) => {
-					console.log("recieved", data);
+			sendMessage("GET_PROFILE")
+				.then((data) => {
+					console.log(`recieved ${data}`);
 					setProfile(data);
 				})
 				.catch(console.error);
@@ -74,68 +72,58 @@ export function ProfilePage() {
 		refreshProfile();
 
 		const refreshWorkspaceData = () => {
-			browser.runtime
-				.sendMessage({
-					type: MessageType.GET_WORKSPACE_DATA,
-					workspaceId: activeProfile,
-				})
-				.then((data: Workspace | null) => {
-					console.log("recieved", data);
+			if (!activeProfile) return;
+			sendMessage("GET_WORKSPACE_DATA", activeProfile)
+				.then((data) => {
+					console.log(`recieved ${data}`);
 					setWorkspaceData(data);
 				})
 				.catch(console.error);
 		};
 
-		const listener = (message: Message) => {
-			console.log("profile", message);
-			switch (message.type) {
-				case MessageType.WORKSPACES_UPDATED:
-					console.log("client workspace updated!");
-					refresh();
-					break;
+		const removeWorkspaces = onMessage("WORKSPACES_UPDATED", () => {
+			refresh();
+			console.log("client workspace updated!");
+		});
 
-				case MessageType.PROFILE_UPDATED:
-					console.log("client profile updated!");
-					refreshProfile();
-					break;
+		const removeProfile = onMessage("PROFILE_UPDATED", () => {
+			refreshProfile();
+			console.log("client profile updated!");
+		});
 
-				case MessageType.WORKSPACE_DATA_UPDATED:
-					refreshWorkspaceData();
-					console.log("workspace data updated!");
-			}
-		};
+		const removeWorkspaceData = onMessage("WORKSPACE_DATA_UPDATED", () => {
+			refreshWorkspaceData();
+			console.log("workspace data updated!");
+		});
 
-		browser.runtime.onMessage.addListener(listener);
 		return () => {
-			browser.runtime.onMessage.removeListener(listener);
+			removeWorkspaces();
+			removeProfile();
+			removeWorkspaceData();
 		};
 	}, []);
 
 	useEffect(() => {
 		if (!activeProfile) return;
-		browser.runtime
-			.sendMessage({
-				type: MessageType.GET_WORKSPACE_DATA,
-				workspaceId: activeProfile,
-			})
-			.then((data: Workspace | null) => {
-				console.log("recieved", data);
+		sendMessage("GET_WORKSPACE_DATA", activeProfile)
+			.then((data) => {
+				console.log(`recieved ${data}`);
 				setWorkspaceData(data);
 			})
 			.catch(console.error);
 	}, [activeProfile]);
 
 	useEffect(() => {
-		if (workspaceData?.resume === undefined || workspaceData.resume === "")
+		if (
+			workspaceData?.resume === undefined ||
+			workspaceData.resume.trim() === ""
+		) {
+			setResume(null);
 			return;
-		const id = workspaceData?.resume;
-
-		browser.runtime
-			.sendMessage({
-				type: MessageType.HAS_BLOB,
-				id: id,
-			})
-			.then((data: ResumeObject) => {
+		}
+		const id = workspaceData.resume;
+		sendMessage("HAS_BLOB", id)
+			.then((data) => {
 				setResume(data);
 				console.log("file exists?", data);
 			})
@@ -285,8 +273,5 @@ function Popup({ leaving, instant }: { leaving: boolean; instant: boolean }) {
 }
 
 export function preview(id: string) {
-	browser.runtime.sendMessage({
-		type: MessageType.PREVIEW,
-		id: id,
-	});
+	sendMessage("PREVIEW", id);
 }

@@ -5,15 +5,13 @@ import FilledIcon from "@/assets/filled_icon_no_color.svg?react";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/views/navigation";
 
-import { MessageType } from "@/lib/message";
+import { sendMessage } from "@/lib/message";
 
 function Extension({ onClose }: { onClose: () => void }) {
 	useEffect(() => {
-		browser.runtime.sendMessage({ type: MessageType.CONTENT_SCRIPT_MOUNTED });
+		sendMessage("CONTENT_SCRIPT_MOUNTED");
 		return () => {
-			browser.runtime.sendMessage({
-				type: MessageType.CONTENT_SCRIPT_UNMOUNTED,
-			});
+			sendMessage("CONTENT_SCRIPT_UNMOUNTED");
 		};
 	}, []);
 	return (
@@ -28,7 +26,7 @@ function Extension({ onClose }: { onClose: () => void }) {
 						variant={"ghost"}
 						className="text-muted-foreground  hover:text-black p-1 transition-colors duration-150"
 						onClick={() => {
-							browser.runtime.sendMessage({ type: MessageType.OPEN_OPTIONS });
+							sendMessage("OPEN_OPTIONS");
 						}}
 					>
 						<Settings />

@@ -1,31 +1,36 @@
 import Dexie, { type Table } from "dexie";
 import type { PublicPath } from "wxt/browser";
-import type {
-	Profile,
-	SettingRecord,
-	Settings,
-	Upload,
-	Workspace,
-	WorkspaceMeta,
-} from "./workspace";
+import type { Profile, Upload, Workspace, WorkspaceMeta } from "./workspace";
+
+const PROFILE_KEY = "profile";
 
 class BrevityDB extends Dexie {
 	workspaces!: Table<Workspace, string>;
 	workspaceMeta!: Table<WorkspaceMeta, string>;
-	settings!: Table<SettingRecord, keyof Settings>;
+	profile!: Table<Profile, string>;
 	uploads!: Table<Upload, string>;
 	constructor() {
 		super("BrevityDB");
 		this.version(1).stores({
 			workspaces: "id, name, createdAt, updatedAt",
 			workspaceMeta: "id, updatedAt",
-			settings: "key",
 			uploads: "id, name, createdAt, updatedAt",
+			profile: "",
 		});
 	}
 }
 
 export const db = new BrevityDB();
+
+export async function getProfile(): Promise<Profile | null> {
+	const profile = await db.profile.get(PROFILE_KEY);
+	return profile ?? null;
+}
+
+export async function setProfile(profile: Profile): Promise<Profile> {
+	await db.profile.put(profile, PROFILE_KEY);
+	return profile;
+}
 
 export async function createMockWorkspace(name: string): Promise<Workspace> {
 	const url = browser.runtime.getURL(
@@ -59,9 +64,7 @@ export async function createMockUser(name: string): Promise<Profile> {
 		throw new Error(`No user template found for "${name}" (${url})`);
 	}
 	const template = (await response.json()) as Profile;
-
-	await db.settings.put({ key: "profile", value: template });
-
+	setProfile(template);
 	return template;
 }
 
@@ -137,9 +140,7 @@ export async function getWorkspace(id: string): Promise<Workspace> {
 }
 
 export async function createTestProfile(profile: Profile): Promise<Profile> {
-	await db.settings.put({ key: "profile", value: profile });
-	const settings = await db.settings.get("profile");
-	return settings?.value as Profile;
+	return setProfile(profile);
 }
 
 export async function getAllWorkspaces(): Promise<Workspace[]> {

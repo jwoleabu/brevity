@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { createTestProfile } from "@/lib/db";
-import { MessageType } from "@/lib/message";
+import { sendMessage } from "@/lib/message";
 import type { Profile } from "@/lib/workspace";
 
 const formSchema = z4.object({
@@ -48,9 +48,7 @@ export function BugReportForm() {
 			phone: data.number,
 		};
 		await createTestProfile(profile);
-		await browser.runtime.sendMessage({
-			type: MessageType.PROFILE_UPDATED,
-		});
+		sendMessage("PROFILE_UPDATED");
 		console.log("sending profile updated");
 	}
 

@@ -1,5 +1,5 @@
-import { db } from "@/lib/db";
-import { type Message, MessageType } from "@/lib/message";
+import { db, getProfile } from "@/lib/db";
+import { onMessage, sendMessage } from "@/lib/message";
 import type { ResumeObject } from "@/lib/workspace";
 
 const activeContentScriptTabs = new Set<number>();
@@ -10,111 +10,79 @@ export default defineBackground(() => {
 	browser.action.onClicked.addListener((tab) => {
 		if (!tab?.id) return;
 		console.log("icon click event");
-		browser.tabs.sendMessage(tab.id, { type: MessageType.TOGGLE_UI });
+		sendMessage("TOGGLE_UI", undefined, tab.id);
 	});
 
-	browser.runtime.onMessage.addListener(
-		(message: Message, sender, sendResponse) => {
-			switch (message.type) {
-				case MessageType.CONTENT_SCRIPT_MOUNTED:
-					if (sender.tab?.id) activeContentScriptTabs.add(sender.tab.id);
-					console.log("tab", sender.tab?.id, "joined the pool");
-					break;
+	onMessage("CONTENT_SCRIPT_MOUNTED", ({ sender }) => {
+		if (sender.tab?.id) activeContentScriptTabs.add(sender.tab.id);
+		console.log("tab", sender.tab?.id, "joined the pool");
+	});
 
-				case MessageType.CONTENT_SCRIPT_UNMOUNTED:
-					if (sender.tab?.id) activeContentScriptTabs.delete(sender.tab.id);
-					console.log("tab", sender.tab?.id, "left the pool");
-					break;
+	onMessage("CONTENT_SCRIPT_UNMOUNTED", ({ sender }) => {
+		if (sender.tab?.id) activeContentScriptTabs.delete(sender.tab.id);
+		console.log("tab", sender.tab?.id, "left the pool");
+	});
 
-				case MessageType.OPEN_OPTIONS:
-					browser.runtime.openOptionsPage();
-					break;
+	onMessage("OPEN_OPTIONS", () => {
+		browser.runtime.openOptionsPage();
+	});
 
-				case MessageType.PREVIEW:
-					browser.tabs.create({
-						url: browser.runtime.getURL(`/preview.html?id=${message.id}`),
-					});
-					break;
+	onMessage("GET_WORKSPACES_META", () => {
+		return db.workspaceMeta.toArray();
+	});
 
-				case MessageType.GET_WORKSPACES_META:
-					db.workspaceMeta
-						.toArray()
-						.then((data) => {
-							console.log("sending", data);
-							sendResponse(data);
-						})
-						.catch(console.error);
-					return true;
+	onMessage("PREVIEW", ({ data }) => {
+		browser.tabs.create({
+			url: browser.runtime.getURL(`/preview.html?id=${data}`),
+		});
+	});
 
-				case MessageType.GET_WORKSPACE_DATA:
-					console.log("workspaceid", message.workspaceId);
-					db.workspaces
-						.get(message.workspaceId)
-						.then((data) => {
-							console.log("sending", data ?? null);
-							sendResponse(data);
-						})
-						.catch(console.error);
-					return true;
+	onMessage("GET_WORKSPACE_DATA", ({ data }) => {
+		console.log("workspaceid", data);
+		return db.workspaces.get(data).then((d) => d ?? null);
+	});
 
-				case MessageType.HAS_BLOB:
-					db.uploads
-						.get(message.id)
-						.then((data) => {
-							if (data) {
-								const resume: ResumeObject = {
-									id: data.id,
-									uploadedAt: data.createdAt,
-								};
-								sendResponse(resume);
-							} else {
-								sendResponse(null);
-							}
-						})
-						.catch(console.error);
-					return true;
+	onMessage("HAS_BLOB", async ({ data }) => {
+		const upload = await db.uploads.get(data);
+		if (!upload) return null;
 
-				case MessageType.GET_PROFILE:
-					db.settings
-						.get("profile")
-						.then((data) => {
-							const profile = data?.value ?? data ?? null;
-							console.log("sending", data);
-							sendResponse(profile);
-						})
-						.catch(console.error);
-					return true;
+		const resume: ResumeObject = {
+			id: upload.id,
+			uploadedAt: upload.createdAt,
+		};
+		return resume;
+	});
 
-				case MessageType.OPTIONS_PAGE_READY:
-					if (pendingOnboarding) {
-						pendingOnboarding = false;
-						browser.runtime.sendMessage({ type: MessageType.START_ONBOARDING });
-					}
-					break;
+	onMessage("GET_PROFILE", async () => {
+		const data = await getProfile();
+		return data;
+	});
 
-				case MessageType.WORKSPACES_UPDATED:
-				case MessageType.PROFILE_UPDATED: {
-					console.log(message.type);
-					console.log("pool:", activeContentScriptTabs);
-					activeContentScriptTabs.forEach((tabId) => {
-						browser.tabs
-							.sendMessage(tabId, { type: message.type })
-							.catch(() => {
-								activeContentScriptTabs.delete(tabId);
-								console.log(
-									"stale tab",
-									sender.tab?.id,
-									"flushed from the pool",
-								);
-							});
-					});
-					break;
-				}
+	onMessage("OPTIONS_PAGE_READY", () => {
+		if (pendingOnboarding) {
+			pendingOnboarding = false;
+			sendMessage("START_ONBOARDING");
+		}
+	});
 
-				default:
-					break;
-			}
-		},
+	const broadcastToContentScripts = (
+		type: "WORKSPACES_UPDATED" | "PROFILE_UPDATED",
+	) => {
+		console.log(type);
+		console.log("pool:", activeContentScriptTabs);
+		activeContentScriptTabs.forEach((tabId) => {
+			sendMessage(type, undefined, tabId).catch(() => {
+				activeContentScriptTabs.delete(tabId);
+				console.log("stale tab", tabId, "flushed from the pool");
+			});
+		});
+	};
+
+	onMessage("WORKSPACES_UPDATED", () =>
+		broadcastToContentScripts("WORKSPACES_UPDATED"),
+	);
+	onMessage("PROFILE_UPDATED", () =>
+		broadcastToContentScripts("PROFILE_UPDATED"),
 	);
 
 	browser.runtime.onInstalled.addListener(async (details) => {
