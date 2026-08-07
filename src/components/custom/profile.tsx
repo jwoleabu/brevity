@@ -53,8 +53,9 @@ export function ProfilePage() {
 				.then((data) => {
 					console.log(`recieved ${data}`);
 					setWorkspaces(data);
-					if (activeProfile === null && data.length > 0) {
-						setActiveProfile(data[0].id);
+					const first = data[0];
+					if (activeProfile === null && first) {
+						setActiveProfile(first.id);
 					}
 				})
 				.catch(console.error);
@@ -175,7 +176,7 @@ export function ProfilePage() {
 			<div className="p-3">
 				<ProfileSection name="User">
 					<div className="rounded-full bg-indigo-300 aspect-square w-11 h-11 flex items-center justify-center text-center font-bold font-sans">
-						<p className="text-xl">{`${profile.firstName[0].toUpperCase()}${profile.lastName[0].toUpperCase()}`}</p>
+						<p className="text-xl">{`${profile.firstName.charAt(0).toUpperCase()}${profile.lastName.charAt(0).toUpperCase()}`}</p>
 					</div>
 					<div className="flex flex-col text-sm">
 						<Block
