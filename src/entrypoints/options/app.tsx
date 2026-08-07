@@ -8,7 +8,7 @@ import {
 	createNewWorkspace,
 	db,
 } from "@/lib/db";
-import { type Message, MessageType } from "@/lib/message";
+import { onMessage, sendMessage } from "@/lib/message";
 
 function App() {
 	const [workspaceName, setWorkspaceName] = useState("");
@@ -19,15 +19,13 @@ function App() {
 	const [text, setText] = useState<string>("options");
 
 	useEffect(() => {
-		browser.runtime.sendMessage({ type: MessageType.OPTIONS_PAGE_READY });
+		sendMessage("OPTIONS_PAGE_READY");
 
-		const listener = (message: Message) => {
-			if (message.type === MessageType.START_ONBOARDING) {
-				setText("onboarding!");
-			}
-		};
-		browser.runtime.onMessage.addListener(listener);
-		return () => browser.runtime.onMessage.removeListener(listener);
+		const removeOnboarding = onMessage("START_ONBOARDING", () => {
+			setText("onboarding!");
+		});
+
+		return () => removeOnboarding();
 	}, []);
 
 	return (
@@ -47,9 +45,7 @@ function App() {
 					if (!workspaceName.trim()) return;
 					try {
 						await createNewWorkspace(workspaceName.trim());
-						await browser.runtime.sendMessage({
-							type: MessageType.WORKSPACES_UPDATED,
-						});
+						sendMessage("WORKSPACES_UPDATED");
 						console.log("sending workspace updated");
 					} catch (err) {
 						console.error(err);
@@ -69,9 +65,7 @@ function App() {
 					if (!mockWorkspaceName.trim()) return;
 					try {
 						await createMockWorkspace(mockWorkspaceName);
-						await browser.runtime.sendMessage({
-							type: MessageType.WORKSPACES_UPDATED,
-						});
+						sendMessage("WORKSPACES_UPDATED");
 					} catch (err) {
 						console.error(err);
 					}
@@ -90,9 +84,7 @@ function App() {
 					if (!mockUserName.trim()) return;
 					try {
 						await createMockUser(mockUserName);
-						await browser.runtime.sendMessage({
-							type: MessageType.PROFILE_UPDATED,
-						});
+						sendMessage("PROFILE_UPDATED");
 					} catch (err) {
 						console.error(err);
 					}

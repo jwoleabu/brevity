@@ -26,6 +26,9 @@ importers:
       '@radix-ui/react-tabs':
         specifier: ^1.1.13
         version: 1.1.13(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@webext-core/messaging':
+        specifier: ^4.0.0
+        version: 4.0.0
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -123,6 +126,9 @@ packages:
     peerDependenciesMeta:
       rollup:
         optional: true
+
+  '@aklinker1/zero-serialize-error@1.0.2':
+    resolution: {integrity: sha512-hGVkgFqb8Zs80JJ7MOSCGQXH2SyWfwnJwOl8Qpp1lUdkp5T7GTf8QrAMib42Hnzx6HtnNYdmNaSSg4MQy+MDRQ==}
 
   '@babel/code-frame@7.29.0':
     resolution: {integrity: sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==}
@@ -1478,6 +1484,14 @@ packages:
 
   '@webext-core/match-patterns@1.0.3':
     resolution: {integrity: sha512-NY39ACqCxdKBmHgw361M9pfJma8e4AZo20w9AY+5ZjIj1W2dvXC8J31G5fjfOGbulW9w4WKpT8fPooi0mLkn9A==}
+
+  '@webext-core/messaging@4.0.0':
+    resolution: {integrity: sha512-1GWLsiWeIRJ/LpSlI87jU3e4KCDhyTadQEwyhMlLSwXOt5/ui2xkVcE96/clxjxqp/FcUBA00c5iT5I3crjlTQ==}
+    peerDependencies:
+      '@types/chrome': '*'
+    peerDependenciesMeta:
+      '@types/chrome':
+        optional: true
 
   '@wxt-dev/auto-icons@1.1.1':
     resolution: {integrity: sha512-Dw2NKK51CCFurE95NptiEheuxVtkeX4vTQwEbhCkFVP9LzXNxOZTX9C9NAsGe6OfahelXlS51TW74hTSzsMILw==}
@@ -3792,6 +3806,8 @@ snapshots:
       source-map: 0.7.6
       yargs: 17.7.2
 
+  '@aklinker1/zero-serialize-error@1.0.2': {}
+
   '@babel/code-frame@7.29.0':
     dependencies:
       '@babel/helper-validator-identifier': 7.28.5
@@ -4947,6 +4963,10 @@ snapshots:
       is-potential-custom-element-name: 1.0.1
 
   '@webext-core/match-patterns@1.0.3': {}
+
+  '@webext-core/messaging@4.0.0':
+    dependencies:
+      '@aklinker1/zero-serialize-error': 1.0.2
 
   '@wxt-dev/auto-icons@1.1.1(wxt@0.20.25(@types/node@25.6.0)(jiti@2.6.1))':
     dependencies:
