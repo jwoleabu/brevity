@@ -14,16 +14,26 @@ import Links from "./links";
 import { ProfileSection } from "./profilesection";
 import Skills from "./skills";
 
-export function ProfilePage() {
+type ProfilePageProps = {
+	workspaces: WorkspaceMeta[];
+	activeProfile: string | null;
+	setActiveProfile: React.Dispatch<React.SetStateAction<string | null>>;
+	setActiveProfileName: React.Dispatch<React.SetStateAction<string | null>>;
+};
+
+export function ProfilePage({
+	workspaces,
+	activeProfile,
+	setActiveProfile,
+	setActiveProfileName,
+}: ProfilePageProps) {
 	const [visible, setVisible] = useState(false);
 	const [leaving, setLeaving] = useState(false);
 	const [instant, setInstant] = useState(false);
 	const hideTimer = useRef<NodeJS.Timeout | null>(null);
 	const unmountTimer = useRef<NodeJS.Timeout | null>(null);
-	const [workspaces, setWorkspaces] = useState<WorkspaceMeta[]>([]);
 	const [workspaceData, setWorkspaceData] = useState<Workspace | null>();
 	const [profile, setProfile] = useState<Profile | null>(null);
-	const [activeProfile, setActiveProfile] = useState<string | null>(null);
 	const [resume, setResume] = useState<ResumeObject | null>(null);
 
 	function copynotify() {
@@ -48,20 +58,6 @@ export function ProfilePage() {
 	}
 
 	useEffect(() => {
-		const refresh = () => {
-			sendMessage("GET_WORKSPACES_META")
-				.then((data) => {
-					console.log(`recieved ${data}`);
-					setWorkspaces(data);
-					const first = data[0];
-					if (activeProfile === null && first) {
-						setActiveProfile(first.id);
-					}
-				})
-				.catch(console.error);
-		};
-		refresh();
-
 		const refreshProfile = () => {
 			sendMessage("GET_PROFILE")
 				.then((data) => {
@@ -82,11 +78,6 @@ export function ProfilePage() {
 				.catch(console.error);
 		};
 
-		const removeWorkspaces = onMessage("WORKSPACES_UPDATED", () => {
-			refresh();
-			console.log("client workspace updated!");
-		});
-
 		const removeProfile = onMessage("PROFILE_UPDATED", () => {
 			refreshProfile();
 			console.log("client profile updated!");
@@ -98,7 +89,6 @@ export function ProfilePage() {
 		});
 
 		return () => {
-			removeWorkspaces();
 			removeProfile();
 			removeWorkspaceData();
 		};
@@ -147,21 +137,35 @@ export function ProfilePage() {
 							className={cn(
 								isActive
 									? "text-white [border-width:thin] border-black bg-black"
-									: "text-gray-700 [border-width:thin] border-indigo-400 bg-[#E6E1FF] hover:bg-[#f3f1ff]",
+									: "text-gray-700 [border-width:thin] border-indigo-400 bg-white hover:bg-[#f3f1ff]",
 								"text-sm font-semibold appearance-none rounded-md transition-none py-1 px-2",
 							)}
-							onPointerDown={() => setActiveProfile(workspace.id)}
-							onKeyDown={(e) => {
+							onPointerDown={() => {
+								setActiveProfile(workspace.id);
+								setActiveProfileName(workspace.name);
+							}}
+							onKeyDown={async (e) => {
 								if ((e.key === "Enter" || e.key === " ") && !e.repeat) {
 									e.preventDefault();
 									setActiveProfile(workspace.id);
+									setActiveProfileName(workspace.name);
 								}
+								await storage.setItem("local:workspace", workspace.name);
 							}}
 						>
 							{workspace.name}
 						</button>
 					);
 				})}
+				<button
+					type="button"
+					className={cn(
+						"text-gray-700 [border-width:thin] border-indigo-400 border-dashed bg-white hover:bg-[#f3f1ff]",
+						"text-sm font-semibold appearance-none rounded-md transition-none py-1 px-2",
+					)}
+				>
+					+
+				</button>
 			</div>
 			<div className="flex flex-col gap-2 p-3 rounded-md bg-muted">
 				<p className="text-sm flex gap-2 font-medium text-foreground">
@@ -175,7 +179,7 @@ export function ProfilePage() {
 
 			<div className="p-3">
 				<ProfileSection name="User">
-					<div className="rounded-full bg-indigo-300 aspect-square w-11 h-11 flex items-center justify-center text-center font-bold font-sans">
+					<div className="rounded-full bg-linear-to-b from-indigo-300 to-indigo-500 aspect-square w-11 h-11 flex items-center justify-center text-center text-white font-bold font-sans">
 						<p className="text-xl">{`${profile.firstName.charAt(0).toUpperCase()}${profile.lastName.charAt(0).toUpperCase()}`}</p>
 					</div>
 					<div className="flex flex-col text-sm">

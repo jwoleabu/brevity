@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 
 type AutofillProps = {
 	savedMinutes: number;
+	activeProfile: string | null
 };
 
 function formatTime(minutes: number) {
@@ -17,7 +18,7 @@ function formatTime(minutes: number) {
 	return `${hours} hour${hours === 1 ? "" : "s"}`;
 }
 
-export function Autofill({ savedMinutes }: AutofillProps) {
+export function Autofill({ savedMinutes, activeProfile: activeProfileName }: AutofillProps) {
 	const [loading, setLoading] = useState(false);
 	const formatted = formatTime(savedMinutes);
 
@@ -40,11 +41,12 @@ export function Autofill({ savedMinutes }: AutofillProps) {
 			<p className="text-sm font-medium text-foreground">
 				Autofill this job application!
 			</p>
+			<p className="text-sm">Filling from: <span className="text-indigo-400">({activeProfileName ?? ""})</span></p>
 			<p className="text-sm">
 				{" "}
 				{formatted ? (
 					<>
-						You have saved <span className="font-semibold">{formatted}</span> by
+						You've saved <span className="font-semibold">{formatted}</span> by
 						autofilling so far.
 					</>
 				) : (

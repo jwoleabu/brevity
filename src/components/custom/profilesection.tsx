@@ -17,15 +17,14 @@ export function ProfileSection({
 	return (
 		<>
 			<p className="text-base mt-5 mb-3 font-semibold">{name}</p>
-			{vertical ? (
-				<div className={cn("border-b pb-4 flex flex-col gap-5", className)}>
-					{children}
-				</div>
-			) : (
-				<div className={cn("border-b pb-4 flex gap-5", className)}>
-					{children}
-				</div>
-			)}
+			<div
+				className={cn(
+					`border-b pb-4 flex gap-5 ${vertical ? "flex-col" : ""}`,
+					className,
+				)}
+			>
+				{children}
+			</div>
 		</>
 	);
 }
