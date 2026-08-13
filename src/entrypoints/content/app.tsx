@@ -41,7 +41,7 @@ function Extension({ onClose }: { onClose: () => void }) {
 				</div>
 			</div>
 			<div
-				className={`overflow-y-auto overscroll-contain [scrollbar-color:var(--color-gray-400)_transparent] [scrollbar-gutter:stable_both-edges] ${import.meta.env.CHROME ? "[scrollbar-width:thin] px-4 pb-4" : "px-7 pb-7"}`}
+				className={`overflow-y-auto overscroll-contain [scrollbar-color:var(--color-gray-400)_transparent] scrollbar-gutter-both ${import.meta.env.CHROME ? "scrollbar-thin px-4 pb-4" : "px-7 pb-7"}`}
 			>
 				<Navigation />
 			</div>

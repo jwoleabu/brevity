@@ -14,8 +14,8 @@ export default function ProfileEducation({ edu, notify }: ExperienceProps) {
 		<ProfileSection name="Education" vertical={true}>
 			{edu.map((e) => (
 				<div key={e.id} className="flex gap-5">
-					<div className="rounded-full bg-indigo-300 aspect-square w-11 h-11 flex items-center justify-center text-center font-extrabold font-sans">
-						<GraduationCap size={28} />
+					<div className="rounded-full bg-linear-to-b from-indigo-300 to-indigo-500 aspect-square w-11 h-11 flex items-center justify-center text-center font-extrabold font-sans">
+						<GraduationCap size={26} color="#fff" />
 					</div>
 					<div className="flex flex-col text-sm">
 						<Block

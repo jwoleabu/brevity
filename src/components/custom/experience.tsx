@@ -14,8 +14,8 @@ export default function ProfileExperience({ exp, notify }: ExperienceProps) {
 		<ProfileSection name="Experience" vertical={true}>
 			{exp.map((e) => (
 				<div key={e.id} className="flex gap-5">
-					<div className="rounded-full bg-indigo-300 aspect-square w-11 h-11 flex items-center justify-center text-center font-extrabold font-sans">
-						<BriefcaseBusiness size={28} />
+					<div className="rounded-full bg-linear-to-b from-indigo-300 to-indigo-500 aspect-square w-11 h-11 flex items-center justify-center text-center font-extrabold font-sans">
+						<BriefcaseBusiness size={26} color="#fff" />
 					</div>
 					<div className="flex flex-col text-sm">
 						<Block
